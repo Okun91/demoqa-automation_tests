@@ -1,4 +1,6 @@
-from pages.elements_pages import TextBoxPages, CheckBoxPage, RadioButtonPage
+import random
+
+from pages.elements_pages import TextBoxPages, CheckBoxPage, RadioButtonPage, WebTablePage
 import time
 
 
@@ -28,6 +30,7 @@ class TestElements:
             assert input_checkbox == output_result
 
     class TestRadioButton:
+
         def test_radio_button(self, driver):
             radio_button_page = RadioButtonPage(driver, 'https://demoqa.com/radio-button')
             radio_button_page.open()
@@ -41,3 +44,19 @@ class TestElements:
             assert output_impressive == 'Impressive', 'radio button "Impressive" have not been selected'
             assert output_no == 'NO', 'radio button "NO" have not been selected'
 
+    class TestWebTables:
+
+        def test_web_table_add_person(self, driver):
+            web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
+            web_table_page.open()
+            new_person = web_table_page.add_new_person()
+            result = web_table_page.check_new_person()
+            assert new_person in result
+
+        def test_web_table_search_person(self, driver):
+            web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
+            web_table_page.open()
+            key_word = web_table_page.add_new_person()[random.randint(0, 5)]
+            web_table_page.search_person(key_word)
+            table_result = web_table_page.check_search_person()
+            assert key_word in table_result
