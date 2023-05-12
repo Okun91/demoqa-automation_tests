@@ -5,6 +5,11 @@ from dataclasses import dataclass
 class Person:
 
     full_name: str = None
+    firstname: str = None
+    lastname: str = None
+    salary: int = None
+    age: int = None
+    department: str = None
     email: str = None
     current_address: str = None
     permanent_address: str = None
