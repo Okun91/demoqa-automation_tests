@@ -1,7 +1,8 @@
+import requests
 from selenium.webdriver.common.by import By
-
+from selenium.common.exceptions import NoSuchElementException, WebDriverException
 from locators.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonPageLocators, \
-    WebTablePageLocators, ButtonsPageLocators
+    WebTablePageLocators, ButtonsPageLocators, LinksPageLocators
 from pages.base_page import BasePage
 from generator.generator import generator_person
 import random
@@ -38,7 +39,7 @@ class CheckBoxPage(BasePage):
         self.element_is_visible(self.locators.EXPAND_ALL).click()
 
     def click_random_checkbox(self):
-        item_list = self.element_are_visible(self.locators.ITEM_LIST)
+        item_list = self.elements_are_visible(self.locators.ITEM_LIST)
         count = 5
         while count != 0:
             item = item_list[random.randint(1, 16)]
@@ -47,7 +48,7 @@ class CheckBoxPage(BasePage):
             count -= 1
 
     def get_checked_checkboxes(self):
-        checked_list = self.element_are_present(self.locators.CHECKED_ITEMS)
+        checked_list = self.elements_are_present(self.locators.CHECKED_ITEMS)
         data = []
         for i in checked_list:
             title_item = i.find_element("xpath", self.locators.TITLE_ITEM)
@@ -55,7 +56,7 @@ class CheckBoxPage(BasePage):
         return str(data).replace(' ', '').replace('doc', '').replace('.', '').lower()
 
     def get_output_results(self):
-        result_list = self.element_are_present(self.locators.OUTPUT_RESULTS)
+        result_list = self.elements_are_present(self.locators.OUTPUT_RESULTS)
         data = []
         for i in result_list:
             data.append(i.text)
@@ -102,7 +103,7 @@ class WebTablePage(BasePage):
             return firstname, lastname, str(age), email, str(salary), department
 
     def check_new_person(self):
-        people_list = self.element_are_present(self.locators.FULL_PEOPLE_LIST)
+        people_list = self.elements_are_present(self.locators.FULL_PEOPLE_LIST)
         data = []
         for item in people_list:
             data.append(tuple(item.text.splitlines()))
@@ -143,7 +144,7 @@ class WebTablePage(BasePage):
         return data
 
     def check_count_rows(self):
-        list_rows = self.element_are_present(self.locators.FULL_PEOPLE_LIST)
+        list_rows = self.elements_are_present(self.locators.FULL_PEOPLE_LIST)
         return len(list_rows)
 
 
@@ -166,6 +167,23 @@ class ButtonsPage(BasePage):
         return self.element_is_present(element).text
 
 
+class LinksPage(BasePage):
+    locators = LinksPageLocators()
 
+    def check_new_tab_simple_link(self):
+        try:
+            simple_link = self.element_is_visible(self.locators.SIMPLE_LINK)
+            href_link = simple_link.get_attribute('href')
+            simple_link.click()
+            self.driver.switch_to.window(self.driver.window_handles[1])
+            url = self.driver.current_url
+            return href_link, url
+        except requests.exceptions.RequestException as e:
+            return str(e)
 
-
+    def check_broken_link(self, url):
+        request = requests.get(url)
+        if request.status_code == 200:
+            self.element_is_present(self.locators.BAD_REQUEST).click()
+        else:
+            return request.status_code
