@@ -18,3 +18,10 @@ def generator_person():
         current_address=faker_ru.address(),
         permanent_address=faker_ru.address(),
     )
+
+
+def generated_file():
+    path = rf'C:\Users\umber\PycharmProjects\demoqa-automation_tests\filetest{random.randint(1, 20)}.txt'
+    with open(path, 'w+') as file:
+        file.write(f'Hello World {random.randint(1, 20)}')
+    return file.name, path
