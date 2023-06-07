@@ -1,7 +1,7 @@
 import base64
 import requests
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException, WebDriverException, TimeoutException
+from selenium.common.exceptions import TimeoutException
 from locators.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonPageLocators, \
     WebTablePageLocators, ButtonsPageLocators, LinksPageLocators, UploadAndDownloadPageLocators, \
     DynamicPropertiesPageLocators
@@ -10,6 +10,7 @@ from generator.generator import generator_person, generated_file
 import random
 import os
 import time
+
 
 class TextBoxPages(BasePage):
     locators = TextBoxPageLocators()
@@ -225,7 +226,7 @@ class DynamicPropertiesPage(BasePage):
         return True
 
     def check_changed_color(self):
-        color_button = self.element_is_present(self.locators.COLOR_CHANGE_BUTTON,)
+        color_button = self.element_is_present(self.locators.COLOR_CHANGE_BUTTON, )
         color_button_before = color_button.value_of_css_property('color')
         time.sleep(5)
         color_button_after = color_button.value_of_css_property('color')
@@ -237,5 +238,3 @@ class DynamicPropertiesPage(BasePage):
         except TimeoutException:
             return "Timeout"
         return True
-
-
