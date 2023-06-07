@@ -1,11 +1,14 @@
+import base64
+
 import requests
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
 from locators.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonPageLocators, \
-    WebTablePageLocators, ButtonsPageLocators, LinksPageLocators
+    WebTablePageLocators, ButtonsPageLocators, LinksPageLocators, UploadAndDownloadPageLocators
 from pages.base_page import BasePage
-from generator.generator import generator_person
+from generator.generator import generator_person, generated_file
 import random
+import os
 
 
 class TextBoxPages(BasePage):
@@ -187,3 +190,26 @@ class LinksPage(BasePage):
             self.element_is_present(self.locators.BAD_REQUEST).click()
         else:
             return request.status_code
+
+
+class UploadAndDownloadPage(BasePage):
+    locators = UploadAndDownloadPageLocators()
+
+    def upload_file(self):
+        file_name, path = generated_file()
+        self.element_is_present(self.locators.UPLOAD_FILE).send_keys(path)
+        os.remove(path)
+        text = self.element_is_present(self.locators.UPLOADED_RESULT).text
+        return file_name.split('\\')[-1], text.split('\\')[-1]
+
+    def download_file(self):
+        link = self.element_is_present(self.locators.DOWNLOAD_FILE).get_attribute('href')
+        link_image = base64.b64decode(link)
+        path_name_file = rf'C:\Users\umber\PycharmProjects\demoqa-automation_tests\filetest{random.randint(1, 20)}.jpeg'
+        with open(path_name_file, 'wb+') as file:
+            offset = link_image.find(b'\xff\xd8')
+            file.write(link_image[offset:])
+            check_file = os.path.exists(path_name_file)
+        os.remove(path_name_file)
+        return check_file
+
